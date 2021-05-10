@@ -1,10 +1,11 @@
+import {server} from '../../../config';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
 
 const article = ({article}) => {
-    //const router = useRouter();
     //const {id} = router.query; 
-
+    //const router = useRouter();
+    
     return (
         <>
             <h1>{article.title}</h1>
@@ -16,6 +17,30 @@ const article = ({article}) => {
 }
 
 export const getStaticProps = async(context) => {
+    const res = await fetch(`${server}/api/articles/${context.params.id}`);
+    const article = await res.json()
+
+    return {
+        props: {
+            article,
+        },
+    }
+}
+
+export const getStaticPaths = async () => {
+    const res = await fetch(`${server}/api/articles`);
+    const articles = await res.json()
+
+    const ids = articles.map((article) => article.id);
+    const paths = ids.map((id) => ({params: {id: id.toString()}}))
+
+    return {
+        paths, 
+        fallback: false 
+    }
+}
+
+/* export const getStaticProps = async(context) => {
     const res = await fetch(`http://jsonplaceholder.typicode.com/posts/${context.params.id}`);
     const article = await res.json()
 
@@ -24,9 +49,9 @@ export const getStaticProps = async(context) => {
             article
         }
     }
-}
+} */
 
-export const getStaticPaths = async () => {
+/* export const getStaticPaths = async () => {
     const res = await fetch(`http://jsonplaceholder.typicode.com/posts`);
     const article = await res.json()
 
@@ -37,6 +62,6 @@ export const getStaticPaths = async () => {
         paths, 
         fallback: false 
     }
-}
+} */
 
 export default article;
